@@ -31,8 +31,8 @@ jobs:
 
       - name: Generate Allure Report
         run: |
-          npm install -g allure-commandline --save-dev
-          npm run open:report
+          npm install -g allure-commandline
+          npm run generate:report
         if: always()
 
       - name: Upload Allure Report as Artifact

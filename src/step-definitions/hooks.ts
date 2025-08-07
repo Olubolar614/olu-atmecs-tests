@@ -8,25 +8,18 @@ setWorldConstructor(CustomWorld);
 
 Before({ tags: "@ui" }, async function (this: CustomWorld) {
   const headlessMode = process.env.HEADLESS === 'true' || false;
-  
-  // Clear previous videos
-  const videoDir = "test-results/videos/";
-  if (fs.existsSync(videoDir)) {
-    fs.rmSync(videoDir, { recursive: true, force: true });
-  }
-
   this.browser = await chromium.launch({
-    headless: headlessMode,
-    slowMo: headlessMode ? 0 : 500,
+    headless: headlessMode,  // <-- Used here
+    slowMo: headlessMode ? 0 : 500, // Add slow motion to see what's happening
   });
-  
   this.context = await this.browser.newContext({
     recordVideo: {
-      dir: videoDir,
+      dir: "test-results/videos/",
     },
   });
-  
   this.page = await this.context.newPage();
+
+  // Set Playwright timeouts
   await this.page.setDefaultNavigationTimeout(30000);
   await this.page.setDefaultTimeout(20000);
 });
@@ -55,15 +48,12 @@ After(async function (this: CustomWorld, scenario) {
       this.attach(screenshot, "image/png");
     }
 
-    await page.close();
-    await context?.close(); // Finalizes video
-    
-    // Universal delay for all OS
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await page.close(); // must close page first
+    await context?.close(); // this finalizes the video
   }
 
-  // Attach video if exists
-  if (videoPath && fs.existsSync(videoPath) && fs.statSync(videoPath).size > 0) {
+  // Now safely read and attach the video
+  if (videoPath && fs.existsSync(videoPath)) {
     const videoBuffer = fs.readFileSync(videoPath);
     this.attach(videoBuffer, "video/webm");
   }
@@ -71,7 +61,6 @@ After(async function (this: CustomWorld, scenario) {
   await browser?.close();
   await this.apiContext?.dispose?.();
 });
-
 After({ tags: "@api" }, async function (scenario) {
   if (scenario.result?.status === Status.FAILED && this.apiResponse) {
     const responseBody = await this.apiResponse.text();
