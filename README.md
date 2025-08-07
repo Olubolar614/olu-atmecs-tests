@@ -120,4 +120,5 @@ npm run open:report
 - 🔍 **Robust Error Handling & Logging**
 - ✨ **SOLID & DRY principles** followed throughout
 
+
 ---
