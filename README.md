@@ -46,7 +46,7 @@ playwright-bdd-framework/
 
 Install the following tools:
 
-- [Node.js](https://nodejs.org/) ≥ 21.x
+- [Node.js](https://nodejs.org/) ≥ 20.x
 
 ---
 
